@@ -59,7 +59,47 @@ async function run() {
     const coursesCollection = db.collection("courses");
     const enrollmentCollection = db.collection("enrollments");
 
-    
+      app.get("/courses", async (req, res) => {
+      //   console.log(req.query);
+
+      const { search } = req.query;
+
+      let cursor;
+
+      if (search) {
+        cursor = await coursesCollection.find({
+          $or: [
+            {
+              title: {
+                $regex: search,
+                $options: "i",
+              },
+            },
+            {
+              instructor: {
+                $regex: search,
+                $options: "i",
+              },
+            },
+          ],
+        });
+
+        // console.log(cursor, 'from search');
+      } else {
+        cursor = coursesCollection.find();
+      }
+
+      const result = await cursor.toArray();
+      //   console.log(result);
+
+      res.send(result);
+    });
+
+    app.get("/featured", async (req, res) => {
+      const cursor = coursesCollection.find().limit(4);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
