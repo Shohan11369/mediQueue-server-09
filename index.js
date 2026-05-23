@@ -101,6 +101,25 @@ async function run() {
       res.send(result);
     });
 
+     app.get("/courses/:courseId", logger, verifyToken, async (req, res) => {
+      // const courseId = req.params.courseId;
+     
+
+      const { courseId } = req.params;
+      //   console.log(courseId);
+      const query = { _id: new ObjectId(courseId) };
+      const result = await coursesCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/enrollments/:userId", verifyToken, async (req, res) => {
+      const { userId } = req.params;
+      const result = await enrollmentCollection
+        .find({ userId: userId })
+        .toArray();
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
