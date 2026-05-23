@@ -30,7 +30,7 @@ const logger = (req, res, next) => {
 
 const verifyToken = async (req, res, next) => {
   const { authorization } = req.headers;
-  //   console.log(req.headers, 'from verify token');
+
   const token = authorization?.split(" ")[1];
   //   console.log(token);
 
@@ -59,7 +59,7 @@ async function run() {
     const enrollmentCollection = db.collection("enrollments");
 
     app.get("/courses", async (req, res) => {
-      //   console.log(req.query);
+   
 
       const { search } = req.query;
 
@@ -105,7 +105,7 @@ async function run() {
     });
 
     app.get("/courses/:courseId", logger, async (req, res) => {
-      // const courseId = req.params.courseId;
+   
 
       const { courseId } = req.params;
       //   console.log(courseId);
@@ -123,7 +123,7 @@ async function run() {
     });
 
     app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
-      //   console.log('from enrollment');
+  
 
       const { courseId } = req.params;
       const enrollmentData = req.body;
@@ -216,8 +216,7 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+    
   }
 }
 run().catch(console.dir);
