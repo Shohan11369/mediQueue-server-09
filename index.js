@@ -15,7 +15,6 @@ const JWKS = createRemoteJWKSet(
   new URL(`${process.env.CLIENT_URL}/api/auth/jwks`),
 );
 
-
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -59,7 +58,7 @@ async function run() {
     const coursesCollection = db.collection("courses");
     const enrollmentCollection = db.collection("enrollments");
 
-      app.get("/courses", async (req, res) => {
+    app.get("/courses", async (req, res) => {
       //   console.log(req.query);
 
       const { search } = req.query;
@@ -70,21 +69,25 @@ async function run() {
         cursor = await coursesCollection.find({
           $or: [
             {
-              title: {
+              tutorName: {
                 $regex: search,
                 $options: "i",
               },
             },
             {
-              instructor: {
+              subject: {
+                $regex: search,
+                $options: "i",
+              },
+            },
+            {
+              location: {
                 $regex: search,
                 $options: "i",
               },
             },
           ],
         });
-
-        // console.log(cursor, 'from search');
       } else {
         cursor = coursesCollection.find();
       }
@@ -101,9 +104,8 @@ async function run() {
       res.send(result);
     });
 
-     app.get("/courses/:courseId", logger, verifyToken, async (req, res) => {
+    app.get("/courses/:courseId", logger, verifyToken, async (req, res) => {
       // const courseId = req.params.courseId;
-     
 
       const { courseId } = req.params;
       //   console.log(courseId);
@@ -120,7 +122,7 @@ async function run() {
       res.send(result);
     });
 
-      app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
+    app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
       //   console.log('from enrollment');
 
       const { courseId } = req.params;
@@ -163,7 +165,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Welcome to the Server");
 });
 
 app.listen(port, () => {
