@@ -59,8 +59,6 @@ async function run() {
     const enrollmentCollection = db.collection("enrollments");
 
     app.get("/courses", async (req, res) => {
-   
-
       const { search } = req.query;
 
       let cursor;
@@ -99,14 +97,12 @@ async function run() {
     });
 
     app.get("/featured", async (req, res) => {
-      const cursor = coursesCollection.find().limit(4);
+      const cursor = coursesCollection.find().limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
 
     app.get("/courses/:courseId", logger, async (req, res) => {
-   
-
       const { courseId } = req.params;
       //   console.log(courseId);
       const query = { _id: new ObjectId(courseId) };
@@ -123,8 +119,6 @@ async function run() {
     });
 
     app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
-  
-
       const { courseId } = req.params;
       const enrollmentData = req.body;
 
@@ -216,7 +210,6 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
   } finally {
-    
   }
 }
 run().catch(console.dir);
