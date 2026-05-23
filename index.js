@@ -57,7 +57,7 @@ async function run() {
     const db = client.db("mediQueue");
     const coursesCollection = db.collection("courses");
     const enrollmentCollection = db.collection("enrollments");
-    const usersCollection = db.collection("users");
+    const usersCollection = db.collection("user");
 
     app.get("/courses", async (req, res) => {
       const { search } = req.query;
