@@ -120,6 +120,38 @@ async function run() {
       res.send(result);
     });
 
+      app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
+      //   console.log('from enrollment');
+
+      const { courseId } = req.params;
+      const enrollmentData = req.body;
+
+      const course = await coursesCollection.findOne({
+        _id: new ObjectId(courseId),
+      });
+
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      await coursesCollection.updateOne(
+        { _id: new ObjectId(courseId) },
+        {
+          $inc: { enrollCount: 1 },
+          $set: {
+            lastEnrolledAt: new Date(),
+          },
+        },
+      );
+      //   console.log(enrollmentData);
+
+      const result = await enrollmentCollection.insertOne({
+        ...enrollmentData,
+        enrolledAt: new Date(),
+      });
+
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
