@@ -104,7 +104,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/courses/:courseId", logger, verifyToken, async (req, res) => {
+    app.get("/courses/:courseId", logger, async (req, res) => {
       // const courseId = req.params.courseId;
 
       const { courseId } = req.params;
@@ -146,8 +146,11 @@ async function run() {
       );
       //   console.log(enrollmentData);
 
-      const result = await enrollmentCollection.insertOne({
+     const result = await enrollmentCollection.insertOne({
         ...enrollmentData,
+       
+        subject: course.subject,        
+        tutorName: course.tutorName,    
         enrolledAt: new Date(),
       });
 
