@@ -130,6 +130,14 @@ async function run() {
       if (!course) {
         return res.status(404).json({ message: "Course not found" });
       }
+
+      //SLOT CHECK 
+      if (course.totalSlot <= 0) {
+        return res.status(400).json({
+          message: "No slots available",
+        });
+      }
+
       await coursesCollection.updateOne(
         { _id: new ObjectId(courseId) },
         {
@@ -154,13 +162,6 @@ async function run() {
       res.send(result);
     });
 
-    // app.delete("/enrollments/:id", async (req, res) => {
-    //   const { id } = req.params;
-    //   const result = await enrollmentCollection.deleteOne({
-    //     _id: new ObjectId(id),
-    //   });
-    //   res.send(result);
-    // });
 
     app.delete("/enrollments/:id", async (req, res) => {
       const { id } = req.params;
