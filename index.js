@@ -57,7 +57,6 @@ async function run() {
     const db = client.db("mediQueue");
     const coursesCollection = db.collection("courses");
     const enrollmentCollection = db.collection("enrollments");
-    const usersCollection = db.collection("user");
 
     app.get("/courses", async (req, res) => {
       const { search } = req.query;
@@ -117,49 +116,6 @@ async function run() {
         .find({ userId: userId })
         .toArray();
       res.send(result);
-    });
-
-    // login 
-    app.post("/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await usersCollection.findOne({ email });
-
-  if (!user) {
-    return res.status(401).json({ message: "User not found" });
-  }
-
-  if (user.password !== password) {
-    return res.status(401).json({ message: "Wrong password" });
-  }
-
-  res.json({ message: "Login successful", user });
-});
-
-    // register auth check
-    app.post("/auth/register", async (req, res) => {
-      const { name, email, password, image } = req.body;
-
-      const existingUser = await usersCollection.findOne({ email });
-
-      if (existingUser) {
-        return res.status(409).json({
-          message: "This email is already registered",
-        });
-      }
-
-      const result = await usersCollection.insertOne({
-        name,
-        email,
-        password,
-        image,
-        createdAt: new Date(),
-      });
-
-      res.status(201).json({
-        message: "User registered successfully",
-        userId: result.insertedId,
-      });
     });
 
     app.patch("/enrollments/:courseId", verifyToken, async (req, res) => {
