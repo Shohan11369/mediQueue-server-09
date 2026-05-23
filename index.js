@@ -131,6 +131,7 @@ async function run() {
       const course = await coursesCollection.findOne({
         _id: new ObjectId(courseId),
       });
+      console.log("Found Course:", course);
 
       if (!course) {
         return res.status(404).json({ message: "Course not found" });
@@ -138,7 +139,7 @@ async function run() {
       await coursesCollection.updateOne(
         { _id: new ObjectId(courseId) },
         {
-          $inc: { enrollCount: 1 },
+          $inc: { totalSlot: -1, enrollCount: 1 },
           $set: {
             lastEnrolledAt: new Date(),
           },
@@ -146,12 +147,66 @@ async function run() {
       );
       //   console.log(enrollmentData);
 
-     const result = await enrollmentCollection.insertOne({
+      const result = await enrollmentCollection.insertOne({
         ...enrollmentData,
-       
-        subject: course.subject,        
-        tutorName: course.tutorName,    
+
+        courseId, //new
+
+        subject: course.subject,
+        tutorName: course.tutorName,
         enrolledAt: new Date(),
+      });
+
+      res.send(result);
+    });
+
+    // app.delete("/enrollments/:id", async (req, res) => {
+    //   const { id } = req.params;
+    //   const result = await enrollmentCollection.deleteOne({
+    //     _id: new ObjectId(id),
+    //   });
+    //   res.send(result);
+    // });
+
+    app.delete("/enrollments/:id", async (req, res) => {
+      const { id } = req.params;
+
+      const enrollment = await enrollmentCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      if (!enrollment) {
+        return res.status(404).send({ message: "Not found" });
+      }
+
+      // delete enrollment
+      await enrollmentCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+
+      //restore slot
+      await coursesCollection.updateOne(
+        { _id: new ObjectId(enrollment.courseId) },
+        {
+          $inc: {
+            totalSlot: 1,
+          },
+        },
+      );
+
+      res.send({ success: true });
+    });
+
+    //
+
+    app.post("/courses", async (req, res) => {
+      const course = req.body;
+
+      const result = await coursesCollection.insertOne({
+        ...course,
+        totalSlot: Number(course.totalSlot || 0),
+        enrollCount: 0,
+        createdAt: new Date(),
       });
 
       res.send(result);
